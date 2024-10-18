@@ -18,6 +18,27 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 # Load environment variables
 load_dotenv()
 
+# Initialize FastAPI app
+app = FastAPI()
+
+# Define the structure for request body
+class QueryRequest(BaseModel):
+    query: str
+
+# Define the structure for document details in the response
+class DocumentDetails(BaseModel):
+    document_name: str
+    pages: List[int]
+
+# Define the response structure
+class ResponseData(BaseModel):
+    answer: str
+    relevant_questions: List[str]
+    documents: List[DocumentDetails]
+
+class QueryResponse(BaseModel):
+    data: ResponseData
+
 # Retrieve API keys from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
@@ -114,12 +135,15 @@ retriever = ContextualCompressionRetriever(
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
 
 # Define the prompt template for the retrieval QA
-prompt_template = """You are tasked with answering the user's question based on the given context. Your answer must be concise, clear, and based only on the provided information.
-Context:
-{context}
-Question:
-{question}
-Answer:"""
+prompt_template = """
+You are tasked with answering the user's question based on the given context, and provide a list of three relevant follow-up questions. Your answer must be concise, clear, and based only on the provided information.
+Context: {context}
+Answer:
+[Provide the answer]
+Relevant questions:
+[List three relevant questions]
+Question: {question}
+"""
 
 # Create the prompt using the defined template
 prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
@@ -133,18 +157,63 @@ retrievalQA = RetrievalQA.from_chain_type(
     chain_type_kwargs={"prompt": prompt}
 )
 
-def ask_question(query: str):
-    """
-    Ask a question using the RetrievalQA chain and return the answer along with the source documents.
-    """
+# Function to process the query and format the response
+def get_answer(query: str) -> Dict:
     result = retrievalQA.invoke({"query": query})
-    return result['result'], result['source_documents']
+    split_output = result.get('result', '').split('Answer:')
+    answer = split_output[-1].strip() if len(split_output) > 1 else split_output[0].strip()
+    response_data = {
+        "data": {
+            "answer": "",
+            "relevant_questions": [],
+            "documents": []
+        }
+    }
+    if "The provided context does not contain information about" in answer:
+        response_data["data"]["answer"] = "Sorry! The model does not know the answer to this question."
+    else:
+        markers = ["Relevant questions:", "Relevant questions related to the user's query:", "relevant questions",
+                   "Recommend questions", "recommend questions", "Here are some relevant questions:",
+                   "Here are some related questions:", "Other questions you might find useful:", "Other relevant questions:"]
+        response_parts = None
+        for marker in markers:
+            if marker in answer:
+                response_parts = answer.split(marker)
+                break
+        if response_parts:
+            ans, reco_ques = response_parts[0].strip(), response_parts[1].strip()
+            response_data["data"]["answer"] = ans
+            response_data["data"]["relevant_questions"] = [q.strip() for q in reco_ques.split('\n') if q.strip()]
+        else:
+            response_data["data"]["answer"] = answer
+            response_data["data"]["relevant_questions"] = ["No relevant questions provided."]
+    document_pages = {}
+    for doc in result.get("source_documents", []):
+        document_name = doc.metadata.get('document_name', 'Unknown')
+        page_number = doc.metadata.get('page', 'Unknown')
+        if document_name not in document_pages:
+            document_pages[document_name] = {"pages": set()}
+        if page_number != 'Unknown':
+            document_pages[document_name]["pages"].add(page_number)
+    for document_name, doc_data in document_pages.items():
+        response_data["data"]["documents"].append({
+            "document_name": document_name,
+            "pages": sorted(doc_data["pages"])
+        })
+    return response_data
 
-# Example question answering
-query = "What is the Global strategic preparedness and response plan for Mpox?"
-answer, source_docs = ask_question(query)
+# FastAPI route to handle the query
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
 
-# Print the question and answer
-print("Question:", query)
-print('\n')
-print("Answer:", answer)
+@app.post("/ask", response_model=QueryResponse)
+async def ask(query_request: QueryRequest):
+    try:
+        result = get_answer(query_request.query)
+        return QueryResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
