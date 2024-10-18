@@ -7,7 +7,9 @@ from langchain.chains import RetrievalQA
 from langchain_cohere import CohereRerank
 from fastapi import FastAPI, HTTPException
 from langchain.prompts import PromptTemplate
+from langchain.retrievers import EnsembleRetriever
 from langchain_community.vectorstores import FAISS
+from langchain_community.retrievers import BM25Retriever
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.retrievers import ContextualCompressionRetriever
@@ -41,32 +43,59 @@ def create_or_load_vectorstore():
         for filename in os.listdir(pdf_folder):
             if filename.endswith('.pdf'):
                 file_path = os.path.join(pdf_folder, filename)
-                loader = PyPDFLoader(file_path)  # Load PDF documents
+                loader = PyPDFLoader(file_path)
                 pdf_documents = loader.load()
                 for doc in pdf_documents:
-                    doc.metadata['document_name'] = filename  # Add document name metadata
+                    doc.metadata['document_name'] = filename
                 documents.extend(pdf_documents)
         
-        # Split documents into manageable chunks
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=256)
         final_documents = text_splitter.split_documents(documents)
-
-        # Create a FAISS vectorstore from the documents
+        
         vectorstore = FAISS.from_documents(final_documents, embedding=embeddings)
-        vectorstore.save_local(vectorstore_path)  # Save the vectorstore locally
+        vectorstore.save_local(vectorstore_path)
+        
+        # Create BM25 Retriever
+        bm25_retriever = BM25Retriever.from_documents(final_documents)
+        
+        return vectorstore, bm25_retriever, final_documents
     else:
         print("Loading existing vectorstore...")
         vectorstore = FAISS.load_local(vectorstore_path, embeddings=embeddings, allow_dangerous_deserialization=True)
-    return vectorstore
+        
+        # We need to recreate the BM25 retriever and documents list
+        documents = []
+        for filename in os.listdir(pdf_folder):
+            if filename.endswith('.pdf'):
+                file_path = os.path.join(pdf_folder, filename)
+                loader = PyPDFLoader(file_path)
+                pdf_documents = loader.load()
+                for doc in pdf_documents:
+                    doc.metadata['document_name'] = filename
+                documents.extend(pdf_documents)
+        
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=256)
+        final_documents = text_splitter.split_documents(documents)
+        
+        bm25_retriever = BM25Retriever.from_documents(final_documents)
+        
+        return vectorstore, bm25_retriever, final_documents
 
 # Attempt to create or load the vectorstore
 try:
-    vectorstore = create_or_load_vectorstore()
+    vectorstore, bm25_retriever, documents = create_or_load_vectorstore()
 except Exception as e:
     print('Not able to load Vectorstore:', e)
+    raise
 
-# Create the base retriever for similarity search
-base_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+# Create the semantic search retriever
+semantic_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+
+# Create the hybrid retriever
+hybrid_retriever = EnsembleRetriever(
+    retrievers=[bm25_retriever, semantic_retriever],
+    weights=[0.5, 0.5]
+)
 
 # Create the CohereRerank compressor for reranking retrieved documents
 compressor = CohereRerank(
@@ -75,10 +104,10 @@ compressor = CohereRerank(
     cohere_api_key=COHERE_API_KEY
 )
 
-# Create the ContextualCompressionRetriever with the base retriever and compressor
+# Create the ContextualCompressionRetriever with the hybrid retriever and compressor
 retriever = ContextualCompressionRetriever(
     base_compressor=compressor,
-    base_retriever=base_retriever
+    base_retriever=hybrid_retriever
 )
 
 # Initialize the OpenAI language model
@@ -111,18 +140,11 @@ def ask_question(query: str):
     result = retrievalQA.invoke({"query": query})
     return result['result'], result['source_documents']
 
-# Example usage
-query = "What is monkey pox?"
+# Example question answering
+query = "What is the Global strategic preparedness and response plan for Mpox?"
 answer, source_docs = ask_question(query)
 
 # Print the question and answer
 print("Question:", query)
 print('\n')
 print("Answer:", answer)
-
-# Print the source documents that contributed to the answer
-print("\nSource Documents:")
-for i, doc in enumerate(source_docs, 1):
-    print(f"\nDocument {i}:")
-    print(f"Content: {doc.page_content[:150]}...")  # Show the first 150 characters
-    print(f"Source: {doc.metadata.get('document_name', 'Unknown')}")  # Print document name or 'Unknown'
