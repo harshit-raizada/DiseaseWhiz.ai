@@ -23,8 +23,8 @@ Before you begin, ensure you have the following:
 
 1. Clone the Repository
 
-`git clone https://github.com/your-repo/intelligent-document-query-system.git`
-`cd intelligent-document-query-system`
+```git clone https://github.com/your-repo/intelligent-document-query-system.git```
+```cd intelligent-document-query-system```
 
 2. Set Up a Virtual Environment
 We recommend using a virtual environment to manage dependencies.
