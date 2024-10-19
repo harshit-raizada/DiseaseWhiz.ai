@@ -28,29 +28,33 @@ Before you begin, ensure you have the following:
 `cd intelligent-document-query-system`
 
 2. Set Up a Virtual Environment
+   
 We recommend using a virtual environment to manage dependencies.
 
 `python -m venv venv`
-`source venv/bin/activate`  # For Unix
-# or
-`venv\Scripts\activate`  # For Windows
+
+`venv\Scripts\activate`
 
 3. Install the Required Dependencies
 
 `pip install -r requirements.txt`
 
 4. Configure Environment Variables
+   
 You’ll need to add your API keys by creating a .env file in the root of the project:
 
 Inside the .env file, add the following lines:
 
 `OPENAI_API_KEY=your_openai_api_key`
+
 `COHERE_API_KEY=your_cohere_api_key`
 
 5. Add Your PDF Documents
+   
 Place any PDF documents you want to use for question-answering in the data/ folder within the project directory. These will be automatically indexed and used for retrieval.
 
-6. Run the Application
+7. Run the Application
+   
 You can start the FastAPI server by running:
 
 `uvicorn main:app --reload` or `python app.py`
