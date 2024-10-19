@@ -23,9 +23,9 @@ Before you begin, ensure you have the following:
 
 ### Clone the Repository
 
-- `git clone https://github.com/your-repo/intelligent-document-query-system.git`
+- `git clone https://github.com/your-repo/DiseaseWhiz.ai.git`
 
-- `cd intelligent-document-query-system`
+- `cd DiseaseWhiz.ai`
 
 ### Set Up a Virtual Environment
    
