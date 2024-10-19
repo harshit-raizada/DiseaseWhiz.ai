@@ -1,8 +1,8 @@
-###Intelligent Document Query System
+### Intelligent Document Query System
 
 Welcome to the Intelligent Document Query System! This system allows users to ask natural language questions based on a collection of PDF documents, retrieving the most relevant answers and providing follow-up questions. It combines powerful retrievers and large language models to generate responses and summarize information efficiently.
 
-##Features
+## Features
 
 - Hybrid Search: Combines semantic search (using FAISS and OpenAI embeddings) with keyword search (BM25 retriever) for highly relevant document retrieval.
 - Contextual Compression: Utilizes Cohere’s powerful re-ranking model to prioritize the most important document snippets.
@@ -11,7 +11,7 @@ Welcome to the Intelligent Document Query System! This system allows users to as
 - Query Decomposition: Decomposes complex queries into atomic questions for granular answers.
 - Follow-Up Suggestions: Provides relevant follow-up questions after answering the initial query.
 
-##Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following:
 
@@ -56,9 +56,9 @@ You can start the FastAPI server by running:
 
 The API will be accessible at http://localhost:8000.
 
-##Usage
+## Usage
 
-###Health Check
+### Health Check
 
 To ensure the service is running, you can perform a health check by navigating to:
 
@@ -70,11 +70,11 @@ You should receive a response:
 }
 `
 
-###Asking Questions
+### Asking Questions
 
 To query the system, use the /ask endpoint. Send a POST request with a query in the following format:
 
-###Request
+### Request
 
 `POST /ask`
 `{
@@ -82,9 +82,9 @@ To query the system, use the /ask endpoint. Send a POST request with a query in 
 }
 `
 
-###Response
+### Response
 
-`{
+```{
     "data": {
         "answer": "**\nZika is a viral infection primarily transmitted by Aedes mosquitoes, particularly Aedes aegypti. It often presents mild symptoms such as fever, rash, and conjunctivitis, but can lead to severe complications, especially during pregnancy, including microcephaly in infants and Guillain-Barré syndrome. Zika can also be transmitted through sexual contact, blood transfusions, and organ transplants. There is currently no vaccine or specific treatment for Zika. Prevention strategies include avoiding travel to affected areas, vector control, community clean-up campaigns, and personal protective measures. Zika is commonly found in tropical and subtropical regions, with significant risks for pregnant women.\n\n**",
         "relevant_questions": [
@@ -157,9 +157,9 @@ To query the system, use the /ask endpoint. Send a POST request with a query in 
         ]
     }
 }
-`
+```
 
-##Project Structure
+## Project Structure
 
 - main.py: The core FastAPI application with the query handler logic.
 - data/: A folder where all PDF documents are stored and indexed.
@@ -167,7 +167,7 @@ To query the system, use the /ask endpoint. Send a POST request with a query in 
 - requirements.txt: List of Python dependencies required for the project.
 - .env: File containing your API keys.
 
-##Technologies Used
+## Technologies Used
 
 FastAPI: A modern, fast web framework for building APIs with Python.
 LangChain: Chain-of-thought framework for language models.
@@ -177,7 +177,7 @@ OpenAI: GPT models for natural language processing.
 Cohere: For document re-ranking and contextual compression.
 Uvicorn: Lightning-fast ASGI server for FastAPI.
 
-##Contributing
+## Contributing
 
 Contributions are welcome! If you'd like to improve this project, feel free to fork the repository and submit a pull request.
 
@@ -189,10 +189,10 @@ Fork the repository.
 - Push to the branch: `git push origin feature-branch-name`.
 - Submit a pull request.
 
-##License
+## License
 
 This project is licensed under the MIT License. See the LICENSE file for more details.
 
-##Support
+## Support
 
 If you encounter any issues or have questions, feel free to open an issue on GitHub.
