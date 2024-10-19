@@ -21,13 +21,13 @@ Before you begin, ensure you have the following:
 - Uvicorn for running the FastAPI server
 - Installation & Setup
 
-1. Clone the Repository
+### Clone the Repository
 
 - `git clone https://github.com/your-repo/intelligent-document-query-system.git`
 
 - `cd intelligent-document-query-system`
 
-2. Set Up a Virtual Environment
+### Set Up a Virtual Environment
    
 We recommend using a virtual environment to manage dependencies.
 
@@ -35,11 +35,11 @@ We recommend using a virtual environment to manage dependencies.
 
 - `venv\Scripts\activate`
 
-3. Install the Required Dependencies
+### Install the Required Dependencies
 
 - `pip install -r requirements.txt`
 
-4. Configure Environment Variables
+### Configure Environment Variables
    
 You’ll need to add your API keys by creating a .env file in the root of the project:
 
@@ -49,11 +49,11 @@ Inside the .env file, add the following lines:
 
 - `COHERE_API_KEY=your_cohere_api_key`
 
-5. Add Your PDF Documents
+### Add Your PDF Documents
    
 Place any PDF documents you want to use for question-answering in the data/ folder within the project directory. These will be automatically indexed and used for retrieval.
 
-6. Run the Application
+### Run the Application
    
 You can start the FastAPI server by running:
 
