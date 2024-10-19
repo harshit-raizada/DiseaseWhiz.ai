@@ -83,81 +83,65 @@ To query the system, use the /ask endpoint. Send a POST request with a query in 
 
 `POST /ask`
 
-`{
-  "query": "What is Dengue?"
+`
+{
+    "query": "What is Cancer and is it curable?"
 }
 `
 
 ### Response
 
-```{
+```
+{
     "data": {
-        "answer": "**\nZika is a viral infection primarily transmitted by Aedes mosquitoes, particularly Aedes aegypti. It often presents mild symptoms such as fever, rash, and conjunctivitis, but can lead to severe complications, especially during pregnancy, including microcephaly in infants and Guillain-Barré syndrome. Zika can also be transmitted through sexual contact, blood transfusions, and organ transplants. There is currently no vaccine or specific treatment for Zika. Prevention strategies include avoiding travel to affected areas, vector control, community clean-up campaigns, and personal protective measures. Zika is commonly found in tropical and subtropical regions, with significant risks for pregnant women.\n\n**",
+        "answer": "**\nCancer is a broad term for diseases characterized by the rapid growth of abnormal cells that can invade nearby tissues and spread to other organs (metastasis). There are various types of cancer, including breast, lung, colon, prostate, skin, and stomach cancers, with cervical cancer being notably prevalent in 23 countries. The development of cancer involves the transformation of normal cells into tumor cells, influenced by genetic factors and external agents such as physical, chemical, and biological carcinogens. Diagnosis typically involves early detection through awareness of symptoms and screening methods. Treatment options vary based on cancer type and may include surgery, radiation, and medications. Many cancers can be cured if detected early, but the likelihood of a cure depends on factors like cancer type, stage at diagnosis, treatment availability, and socioeconomic conditions.\n\n**",
         "relevant_questions": [
             "**",
-            "1. What are the current research efforts focused on developing a vaccine or treatment for Zika?",
-            "2. How can communities effectively implement vector control strategies to reduce the risk of Zika transmission?",
-            "3. What specific guidelines should pregnant women follow if they are in or traveling to areas with reported Zika cases?"
+            "1. What are the most effective screening methods for early detection of different types of cancer?",
+            "2. How do socioeconomic factors impact access to cancer treatment and outcomes in different regions?",
+            "3. What advancements are being made in cancer research to improve treatment options and cure rates?"
         ],
         "documents": [
             {
-                "document_name": "9789241565530-eng.pdf",
+                "document_name": "Cancer.pdf",
                 "pages": [
-                    95
+                    0
                 ]
             },
             {
-                "document_name": "9789241565530-eng.pdf",
+                "document_name": "Cancer.pdf",
                 "pages": [
-                    97
+                    1
                 ]
             },
             {
-                "document_name": "9789241565530-eng.pdf",
+                "document_name": "Cancer.pdf",
                 "pages": [
-                    103
+                    3
                 ]
             },
             {
-                "document_name": "9789241565530-eng.pdf",
+                "document_name": "Cancer.pdf",
                 "pages": [
-                    99
+                    7
                 ]
             },
             {
-                "document_name": "9789241565530-eng.pdf",
+                "document_name": "Cancer.pdf",
                 "pages": [
-                    110
+                    8
                 ]
             },
             {
-                "document_name": "9789241565530-eng.pdf",
+                "document_name": "Cancer.pdf",
                 "pages": [
-                    98
+                    4
                 ]
             },
             {
-                "document_name": "9789241565530-eng.pdf",
+                "document_name": "Cancer.pdf",
                 "pages": [
-                    101
-                ]
-            },
-            {
-                "document_name": "9789241565530-eng.pdf",
-                "pages": [
-                    100
-                ]
-            },
-            {
-                "document_name": "9789241565530-eng.pdf",
-                "pages": [
-                    102
-                ]
-            },
-            {
-                "document_name": "9789241565530-eng.pdf",
-                "pages": [
-                    96
+                    9
                 ]
             }
         ]
