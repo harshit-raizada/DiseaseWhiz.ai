@@ -84,7 +84,7 @@ To query the system, use the /ask endpoint. Send a POST request with a query in 
 `POST /ask`
 
 `{
-  "query": "What is Dengue?"
+  "query": "What is Zika?"
 }
 `
 
