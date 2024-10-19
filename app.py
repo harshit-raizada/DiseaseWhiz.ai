@@ -5,18 +5,16 @@ import uvicorn
 from typing import List, Dict
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from langchain.chains import LLMChain
-from langchain.chains import RetrievalQA
 from langchain_cohere import CohereRerank
 from fastapi import FastAPI, HTTPException
 from langchain.prompts import PromptTemplate
-from langchain.retrievers import EnsembleRetriever
+from langchain.chains import LLMChain, RetrievalQA
 from langchain_community.vectorstores import FAISS
 from langchain_community.retrievers import BM25Retriever
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.retrievers import ContextualCompressionRetriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.retrievers import EnsembleRetriever, ContextualCompressionRetriever
 
 # Load environment variables
 load_dotenv()
@@ -243,7 +241,7 @@ def get_answer(query: str) -> Dict:
             "documents": all_documents
         }
     }
-    
+
     return response_data
 
 # FastAPI route to handle the query
