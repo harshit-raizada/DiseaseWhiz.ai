@@ -1,4 +1,4 @@
-### Intelligent Document Query System
+### DiseaseWhiz.ai
 
 Welcome to the Intelligent Document Query System! This system allows users to ask natural language questions based on a collection of PDF documents, retrieving the most relevant answers and providing follow-up questions. It combines powerful retrievers and large language models to generate responses and summarize information efficiently.
 
@@ -167,21 +167,21 @@ To query the system, use the /ask endpoint. Send a POST request with a query in 
 
 ## Project Structure
 
-- main.py: The core FastAPI application with the query handler logic.
-- data/: A folder where all PDF documents are stored and indexed.
-- vectorstore.faiss: The FAISS index file for semantic document retrieval.
-- requirements.txt: List of Python dependencies required for the project.
-- .env: File containing your API keys.
+- **main.py**: The core FastAPI application with the query handler logic.
+- **data/**: A folder where all PDF documents are stored and indexed.
+- **vectorstore.faiss**: The FAISS index file for semantic document retrieval.
+- **requirements.txt**: List of Python dependencies required for the project.
+- **.env**: File containing your API keys.
 
 ## Technologies Used
 
-- FastAPI: A modern, fast web framework for building APIs with Python.
-- LangChain: Chain-of-thought framework for language models.
-- FAISS: Facebook AI Similarity Search for semantic document retrieval.
-- BM25: Term-based retriever for traditional keyword search.
-- OpenAI: GPT models for natural language processing.
-- Cohere: For document re-ranking and contextual compression.
-- Uvicorn: Lightning-fast ASGI server for FastAPI.
+- **FastAPI**: A modern, fast web framework for building APIs with Python.
+- **LangChain**: Chain-of-thought framework for language models.
+- **FAISS**: Facebook AI Similarity Search for semantic document retrieval.
+- **BM25**: Term-based retriever for traditional keyword search.
+- **OpenAI**: GPT models for natural language processing.
+- **Cohere**: For document re-ranking and contextual compression.
+- **Uvicorn**: Lightning-fast ASGI server for FastAPI.
 
 ## Contributing
 
@@ -201,4 +201,4 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 ## Support
 
-If you encounter any issues or have questions, feel free to open an issue on GitHub.
+If you encounter any issues or have questions, feel free to open an issue on GitHub or reach out on [https://www.linkedin.com/in/harshit-raizada/]
