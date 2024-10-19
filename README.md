@@ -1,6 +1,6 @@
 ### DiseaseWhiz.ai
 
-Welcome to the Intelligent Document Query System! This system allows users to ask natural language questions based on a collection of PDF documents, retrieving the most relevant answers and providing follow-up questions. It combines powerful retrievers and large language models to generate responses and summarize information efficiently.
+DiseaseWhiz.ai is an AI-powered chatbot designed to provide accurate and comprehensive information about various diseases, including their history, symptoms, and effective management strategies. With a user-friendly interface, DiseaseWhiz.ai aims to educate and empower users by offering reliable insights into health topics such as mental disorders, STIs, dengue, herpes, monkeypox, and Zika.
 
 ## Features
 
