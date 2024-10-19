@@ -1,9 +1,11 @@
 # Import required libraries
 import os
+import re
 import uvicorn
 from typing import List, Dict
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from langchain.chains import LLMChain
 from langchain.chains import RetrievalQA
 from langchain_cohere import CohereRerank
 from fastapi import FastAPI, HTTPException
@@ -136,18 +138,39 @@ retriever = ContextualCompressionRetriever(
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
 
 # Define the prompt template for the retrieval QA
-prompt_template = """
-You are tasked with answering the user's question based on the given context, and provide a list of three relevant follow-up questions. Your answer must be concise, clear, and based only on the provided information.
-Context: {context}
-Answer:
-[Provide the answer]
-Relevant questions:
-[List three relevant questions]
-Question: {question}
-"""
+decomposition_template = """
+Given the following user query, break it down into individual, atomic questions:
 
-# Create the prompt using the defined template
-prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+User Query: {query}
+
+Please list each atomic question on a new line.
+"""
+decomposition_prompt = PromptTemplate(template=decomposition_template, input_variables=["query"])
+
+# Create a chain for query decomposition
+decomposition_chain = LLMChain(llm=llm, prompt=decomposition_prompt)
+
+# Updated prompt template for answering individual questions
+answer_template = """
+You are an expert AI assistant tasked with answering the following question based on the given context. Your goal is to provide an accurate, concise, and clear response.
+
+Context: {context}
+
+Question: {question}
+
+Instructions:
+1. Provide a concise answer based on the context.
+2. If you don't have relevant information in the context, explicitly state that you don't have information on that specific topic.
+
+Format your response as follows:
+
+Answer:
+[Your answer here]
+
+Now, please answer the following question:
+{question}
+"""
+answer_prompt = PromptTemplate(template=answer_template, input_variables=["context", "question"])
 
 # Create the RetrievalQA chain with the language model, retriever, and prompt
 retrievalQA = RetrievalQA.from_chain_type(
@@ -155,52 +178,72 @@ retrievalQA = RetrievalQA.from_chain_type(
     chain_type="stuff",
     retriever=retriever,
     return_source_documents=True,
-    chain_type_kwargs={"prompt": prompt}
+    chain_type_kwargs={"prompt": answer_prompt}
 )
 
 # Function to process the query and format the response
 def get_answer(query: str) -> Dict:
-    result = retrievalQA.invoke({"query": query})
-    split_output = result.get('result', '').split('Answer:')
-    answer = split_output[-1].strip() if len(split_output) > 1 else split_output[0].strip()
+    """
+    Process the query by breaking it down into sub-queries, answering each separately,
+    and then combining the results.
+    """
+    # Decompose the query
+    decomposed_queries = decomposition_chain.run(query).strip().split('\n')
+    
+    combined_answer = ""
+    all_relevant_questions = []
+    all_documents = []
+
+    # Process each sub-query
+    for sub_query in decomposed_queries:
+        result = retrievalQA.invoke({"query": sub_query})
+        answer = result.get('result', '').strip()
+        
+        # Extract the answer, skipping any "Answer:" prefix
+        answer_match = re.search(r'(?:Answer:)?\s*(.*)', answer, re.DOTALL)
+        if answer_match:
+            sub_answer = answer_match.group(1).strip()
+            combined_answer += f"Question: {sub_query}\n{sub_answer}\n\n"
+        
+        # Process source documents
+        for doc in result.get("source_documents", []):
+            doc_info = {
+                "document_name": doc.metadata.get('document_name', 'Unknown'),
+                "pages": [doc.metadata.get('page', 'Unknown')]
+            }
+            if doc_info not in all_documents:
+                all_documents.append(doc_info)
+
+    # Generate a summary and relevant questions based on the combined answer
+    summary_prompt = PromptTemplate(
+        template="Summarize the following information and provide 3 relevant follow-up questions:\n\n{combined_answer}",
+        input_variables=["combined_answer"]
+    )
+    summary_chain = LLMChain(llm=llm, prompt=summary_prompt)
+    summary_result = summary_chain.run(combined_answer).strip()
+
+    # Extract summary and relevant questions
+    summary_match = re.search(r'Summary:(.*?)(?:Follow-up Questions:|$)', summary_result, re.DOTALL)
+    if summary_match:
+        summary = summary_match.group(1).strip()
+    else:
+        summary = "Unable to generate summary."
+
+    relevant_questions_match = re.search(r'Follow-up Questions:(.*?)$', summary_result, re.DOTALL)
+    if relevant_questions_match:
+        relevant_questions = relevant_questions_match.group(1).strip().split('\n')
+        all_relevant_questions = [q.strip() for q in relevant_questions if q.strip()]
+    else:
+        all_relevant_questions = ["No relevant questions found."]
+
     response_data = {
         "data": {
-            "answer": "",
-            "relevant_questions": [],
-            "documents": []
+            "answer": summary,
+            "relevant_questions": all_relevant_questions,
+            "documents": all_documents
         }
     }
-    if "The provided context does not contain information about" in answer:
-        response_data["data"]["answer"] = "Sorry! The model does not know the answer to this question."
-    else:
-        markers = ["Relevant questions:", "Relevant questions related to the user's query:", "relevant questions",
-                   "Recommend questions", "recommend questions", "Here are some relevant questions:",
-                   "Here are some related questions:", "Other questions you might find useful:", "Other relevant questions:"]
-        response_parts = None
-        for marker in markers:
-            if marker in answer:
-                response_parts = answer.split(marker)
-                break
-        if response_parts:
-            ans, reco_ques = response_parts[0].strip(), response_parts[1].strip()
-            response_data["data"]["answer"] = ans
-            response_data["data"]["relevant_questions"] = [q.strip() for q in reco_ques.split('\n') if q.strip()]
-        else:
-            response_data["data"]["answer"] = answer
-            response_data["data"]["relevant_questions"] = ["No relevant questions provided."]
-    document_pages = {}
-    for doc in result.get("source_documents", []):
-        document_name = doc.metadata.get('document_name', 'Unknown')
-        page_number = doc.metadata.get('page', 'Unknown')
-        if document_name not in document_pages:
-            document_pages[document_name] = {"pages": set()}
-        if page_number != 'Unknown':
-            document_pages[document_name]["pages"].add(page_number)
-    for document_name, doc_data in document_pages.items():
-        response_data["data"]["documents"].append({
-            "document_name": document_name,
-            "pages": sorted(doc_data["pages"])
-        })
+
     return response_data
 
 # FastAPI route to handle the query
