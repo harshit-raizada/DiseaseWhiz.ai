@@ -243,7 +243,7 @@ def get_answer(query: str) -> Dict:
             "documents": all_documents
         }
     }
-
+    
     return response_data
 
 # FastAPI route to handle the query
