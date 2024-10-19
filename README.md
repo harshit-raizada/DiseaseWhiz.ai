@@ -23,21 +23,21 @@ Before you begin, ensure you have the following:
 
 1. Clone the Repository
 
-`git clone https://github.com/your-repo/intelligent-document-query-system.git`
+- `git clone https://github.com/your-repo/intelligent-document-query-system.git`
 
-`cd intelligent-document-query-system`
+- `cd intelligent-document-query-system`
 
 2. Set Up a Virtual Environment
    
 We recommend using a virtual environment to manage dependencies.
 
-`python -m venv venv`
+- `python -m venv venv`
 
-`venv\Scripts\activate`
+- `venv\Scripts\activate`
 
 3. Install the Required Dependencies
 
-`pip install -r requirements.txt`
+- `pip install -r requirements.txt`
 
 4. Configure Environment Variables
    
@@ -45,19 +45,19 @@ You’ll need to add your API keys by creating a .env file in the root of the pr
 
 Inside the .env file, add the following lines:
 
-`OPENAI_API_KEY=your_openai_api_key`
+- `OPENAI_API_KEY=your_openai_api_key`
 
-`COHERE_API_KEY=your_cohere_api_key`
+- `COHERE_API_KEY=your_cohere_api_key`
 
 5. Add Your PDF Documents
    
 Place any PDF documents you want to use for question-answering in the data/ folder within the project directory. These will be automatically indexed and used for retrieval.
 
-7. Run the Application
+6. Run the Application
    
 You can start the FastAPI server by running:
 
-`uvicorn main:app --reload` or `python app.py`
+- `uvicorn main:app --reload` or `python app.py`
 
 The API will be accessible at http://localhost:8000.
 
@@ -82,6 +82,7 @@ To query the system, use the /ask endpoint. Send a POST request with a query in 
 ### Request
 
 `POST /ask`
+
 `{
   "query": "What is Dengue?"
 }
@@ -174,13 +175,13 @@ To query the system, use the /ask endpoint. Send a POST request with a query in 
 
 ## Technologies Used
 
-FastAPI: A modern, fast web framework for building APIs with Python.
-LangChain: Chain-of-thought framework for language models.
-FAISS: Facebook AI Similarity Search for semantic document retrieval.
-BM25: Term-based retriever for traditional keyword search.
-OpenAI: GPT models for natural language processing.
-Cohere: For document re-ranking and contextual compression.
-Uvicorn: Lightning-fast ASGI server for FastAPI.
+- FastAPI: A modern, fast web framework for building APIs with Python.
+- LangChain: Chain-of-thought framework for language models.
+- FAISS: Facebook AI Similarity Search for semantic document retrieval.
+- BM25: Term-based retriever for traditional keyword search.
+- OpenAI: GPT models for natural language processing.
+- Cohere: For document re-ranking and contextual compression.
+- Uvicorn: Lightning-fast ASGI server for FastAPI.
 
 ## Contributing
 
