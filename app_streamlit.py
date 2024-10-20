@@ -44,20 +44,37 @@ st.markdown("""
         font-size: 1.5rem;  /* Increase font size for subheaders */
     }
     .answer-box {
-        background-color: #ffffff;
+        background-color: #e9ecef;  /* Light gray background for answer box */
         border-radius: 8px;
-        padding: 1rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        margin-top: 1rem;
-        font-size: 1.2rem;  /* Font size for answers */
+        padding: 1.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);  /* More subtle shadow */
+        margin-top: 1.5rem;
+        font-size: 1.25rem;  /* Larger font size for answers */
+        line-height: 1.6;  /* Increase line height for readability */
         color: #333;  /* Dark text color for visibility */
+        border-left: 5px solid #007bff;  /* Add a left border for accent */
+    }
+    .question-box {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background-color: #f8f9fa;  /* Light background for questions */
+        border-radius: 4px;
+        font-size: 1.1rem;
+        color: #333;
     }
     .document-box {
-        background-color: #e9ecef;  /* Light gray for document box */
-        border-radius: 4px;
-        padding: 0.5rem;
-        margin-bottom: 0.5rem;
+        background-color: #f8f9fa;  /* Light gray for document box */
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        border-left: 4px solid #28a745;  /* Green accent border */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
         color: #333;  /* Dark text color for visibility */
+    }
+    .unordered-list {
+        list-style-type: disc;  /* Bullet list */
+        padding-left: 1.5rem;
+        margin: 0;
     }
     .sidebar {
         background-color: #f1f3f5;  /* Light background for sidebar */
@@ -102,13 +119,15 @@ def main():
 
                 # Display relevant questions
                 st.markdown('<h4 class="stSubheader">Relevant Questions:</h4>', unsafe_allow_html=True)
+                st.markdown('<ul class="unordered-list">', unsafe_allow_html=True)
                 for question in result["data"]["relevant_questions"]:
-                    st.markdown(f"- {question}")
+                    st.markdown(f"<li>{question}</li>", unsafe_allow_html=True)
+                st.markdown('</ul>', unsafe_allow_html=True)
 
                 # Display document sources
                 st.markdown('<h4 class="stSubheader">Source Documents:</h4>', unsafe_allow_html=True)
                 for doc in result["data"]["documents"]:
-                    st.markdown(f'<div class="document-box">Document: {doc["document_name"]}<br>Pages: {", ".join(map(str, doc["pages"]))}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="document-box"><strong>Document:</strong> {doc["document_name"]}<br><strong>Pages:</strong> {", ".join(map(str, doc["pages"]))}</div>', unsafe_allow_html=True)
 
             except requests.exceptions.RequestException as e:
                 st.error(f"An error occurred: {str(e)}")
