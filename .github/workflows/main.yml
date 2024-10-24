@@ -88,9 +88,7 @@ jobs:
 
       - name: Run Docker Image to serve users
         run: |
-         
-         docker run -d -p 8000:8000 --ipc="host" --name=diseasewhiz1 -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e AWS_REGION=${{ secrets.AWS_REGION }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} -e COHERE_API_KEY=${{ secrets.COHERE_API_KEY }} ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
-
+         docker run -d -p 8000:8000 --ipc="host" --name=diseasewhiz1 -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}' -e 'OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}' -e 'COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}' ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
       - name: Clean previous images and containers
         run: |
-          docker system prune -f
+         docker system prune -f
